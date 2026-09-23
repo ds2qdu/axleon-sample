@@ -80,10 +80,9 @@ def main():
             avg /= world
         history.append(avg.item())
         elapsed = time.time() - started
-        if rank == 0:
-            mem = f" gpu_mem {torch.cuda.max_memory_allocated(device) / 2**20:.0f}MiB" if cuda else ""
-            print(f"epoch {epoch} loss {avg.item():.4f} ({time.time() - epoch_started:.1f}s, total {elapsed:.0f}s){mem}",
-                  flush=True)
+        mem = f" gpu_mem {torch.cuda.max_memory_allocated(device) / 2**20:.0f}MiB" if cuda else ""
+        print(f"rank {rank} epoch {epoch} loss {avg.item():.4f} ({time.time() - epoch_started:.1f}s, total {elapsed:.0f}s){mem}",
+              flush=True)
         more = torch.tensor(int(epoch < epochs or elapsed < min_seconds), device=device)
         if world > 1:
             dist.all_reduce(more, op=dist.ReduceOp.MAX)
