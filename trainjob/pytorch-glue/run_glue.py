@@ -37,7 +37,7 @@ def compute_metrics(eval_pred):
 
 
 def main():
-    model_name = os.environ.get("MODEL_NAME", "distilbert-base-uncased")
+    model_name = os.environ.get("MODEL_NAME", "distilbert/distilbert-base-uncased")
     task = os.environ.get("TASK", "mrpc")
     epochs = float(os.environ.get("EPOCHS", "3"))
     batch = int(os.environ.get("BATCH_SIZE", "32"))
@@ -47,7 +47,7 @@ def main():
         raise SystemExit(f"TASK must be one of {sorted(TASK_KEYS)}, got {task!r}")
     key1, key2 = TASK_KEYS[task]
 
-    raw = load_dataset("glue", task)
+    raw = load_dataset("nyu-mll/glue", task)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
     def tokenize(rows):

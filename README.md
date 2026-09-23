@@ -16,6 +16,6 @@ NPROC_PER_NODE=1 HIDDEN=256 BATCH_SIZE=256 MIN_SECONDS=0 bash trainjob/pytorch-e
 
 ```bash
 git clone --depth=1 https://github.com/ds2qdu/axleon-sample.git /tmp/repo && bash /tmp/repo/trainjob/pytorch-glue/run.sh   # asset args
-MODEL_NAME=distilbert-base-uncased TASK=mrpc EPOCHS=3 BATCH_SIZE=32 MAX_SEQ_LENGTH=128 NPROC_PER_NODE=gpu   # env (defaults)
+MODEL_NAME=distilbert/distilbert-base-uncased TASK=mrpc EPOCHS=3 BATCH_SIZE=32 MAX_SEQ_LENGTH=128 NPROC_PER_NODE=gpu   # env (defaults)
 HF_ENDPOINT=https://<mirror>   # env, optional: HuggingFace Hub mirror when the pod has no internet
 ```
