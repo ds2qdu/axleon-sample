@@ -7,8 +7,8 @@ Asset runtime: command `bash`, args `-c` plus the one-line clone-and-run below.
 
 ```bash
 git clone --depth=1 https://github.com/ds2qdu/axleon-sample.git /tmp/repo && bash /tmp/repo/trainjob/pytorch-example/run.sh   # asset args
-EPOCHS=3 STEPS_PER_EPOCH=50 BATCH_SIZE=64   # env (defaults in train.py)
-torchrun trainjob/pytorch-example/train.py   # run by hand
+MIN_SECONDS=120 EPOCHS=5 STEPS_PER_EPOCH=100 BATCH_SIZE=4096 HIDDEN=4096 LAYERS=4   # env (defaults in train.py)
+HIDDEN=256 BATCH_SIZE=256 MIN_SECONDS=0 torchrun trainjob/pytorch-example/train.py   # quick run by hand (CPU ok)
 ```
 
 ## trainjob/pytorch-glue
