@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
 set -eu
-: "${S3_SRC:?S3_SRC must be the s3:// prefix holding env.sh, run_glue.py and axleon_progress/}"
-S3_SRC="${S3_SRC%/}"
+cd "$(dirname "$0")"
 
-python3 -m pip install --no-cache-dir --root-user-action=ignore awscli
+python3 -m pip install --no-cache-dir --root-user-action=ignore -q \
+  "transformers>=4.46,<6" "datasets>=3" "accelerate>=1"
 
-python3 -m awscli s3 cp "$S3_SRC/env.sh" /workspace/env.sh
-python3 -m awscli s3 cp "$S3_SRC/run_glue.py" /workspace/run_glue.py
-python3 -m awscli s3 cp "$S3_SRC/axleon_progress/" /tmp/axleon/ --recursive
-
-SITE_PACKAGES=$(python3 -c "import site; print(site.getsitepackages()[0])")
-cp -r /tmp/axleon/axleon_progress "$SITE_PACKAGES/axleon_progress"
-cp /tmp/axleon/axleon_progress.pth "$SITE_PACKAGES/axleon_progress.pth"
-
-chmod +x /workspace/env.sh
-exec /workspace/env.sh
+nproc="${NPROC_PER_NODE:-gpu}"
+nodes="${PET_NNODES:-${KUBE_NODE_SIZE:-1}}"
+if [ "$nodes" -gt 1 ] && [ -z "${PET_MASTER_ADDR:-}" ]; then
+  job="${KUBE_TRAINJOB_NAME:-${HOSTNAME%-trainer-*}}"
+  exec torchrun --nnodes="$nodes" --node_rank="${JOB_COMPLETION_INDEX:-${HOSTNAME##*-}}" \
+    --master_addr="${job}-trainer-0-0.${job}" --master_port=29500 \
+    --nproc_per_node="$nproc" run_glue.py
+fi
+exec torchrun --nproc_per_node="$nproc" run_glue.py
