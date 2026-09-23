@@ -1,10 +1,11 @@
-"""GLUE fine-tuning sample: a small pretrained model on MRPC by default, HuggingFace Trainer.
+"""GLUE fine-tuning sample: a small pretrained model on SST-2 by default, HuggingFace Trainer.
 
 torchrun sets RANK / WORLD_SIZE / LOCAL_RANK; Trainer switches to DDP automatically when WORLD_SIZE > 1.
 Model and dataset are downloaded from the HuggingFace Hub (needs network or a mirror via HF_ENDPOINT).
 """
 import os
 
+import torch
 from datasets import load_dataset
 from transformers import (
     AutoModelForSequenceClassification,
@@ -38,7 +39,7 @@ def compute_metrics(eval_pred):
 
 def main():
     model_name = os.environ.get("MODEL_NAME", "distilbert/distilbert-base-uncased")
-    task = os.environ.get("TASK", "mrpc")
+    task = os.environ.get("TASK", "sst2")
     epochs = float(os.environ.get("EPOCHS", "3"))
     batch = int(os.environ.get("BATCH_SIZE", "32"))
     max_len = int(os.environ.get("MAX_SEQ_LENGTH", "128"))
@@ -94,6 +95,9 @@ def main():
             except ImportError:
                 print("mlflow not installed; skipping tracking", flush=True)
         print("done", flush=True)
+
+    if torch.distributed.is_initialized():
+        torch.distributed.destroy_process_group()
 
 
 if __name__ == "__main__":
